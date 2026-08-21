@@ -1,0 +1,64 @@
+Comando net user:
+
+    El comando net user es una herramienta de consola exclusiva de Windows que permite crear, modificar, eliminar y consultar cuentas de usuario local en el equipo.
+    (Nota: La mayoría de las acciones de modificación requieren ejecutar el Símbolo del sistema (cmd) o PowerShell como Administrador).
+    Desglose de las cuentas del sistema:
+    sever: Es la cuenta personal de usuario creada en este equipo.
+    Administrador: La cuenta nativa de administrador local de Windows (por defecto suele estar desactivada por motivos de seguridad).
+    Invitado: Cuenta integrada para accesos temporales sin privilegios (desactivada por defecto).
+    DefaultAccount: Cuenta del sistema utilizada por Windows para administrar procesos e instalaciones del sistema operativo.
+    WDAGUtilityAccount: Cuenta administrada por la herramienta Windows Defender Application Guard para ejecutar contenedores seguros en el navegador.
+
+Comando  net user <usuario>:
+
+    Permite ver todas las informaciones, permisos etc.. de un usuario en especifico, por ejemplo, nombre de usuario, nombre completo, ultimo cambio contraseña, si puedo iniciar sesion en x tiempo, si la cuenta esta activa o inactiva.
+
+Comando net user <usuario> <contraseña> /add
+
+    permite la creacion de un nuevo usario y para esto se necesitan permisos de administrador.
+
+Comando net user <usuario> /delete
+
+    Permite la eliminacion de un usuario en especifico y para esto se necesita permisos de administrador.
+
+Comando  net user <usuario> <nueva_contraseña>
+
+    Permite cambiar o restablecer la contraseña de una usuario.
+
+Comando  net user <usuario> /times:<días,horas>
+
+    Permite establecer un horario en el que usuario podra y no podra acceder.
+
+Comando  net user <usuario> /active:yes
+
+    Permite decidir si la cuenta estara activa osea habilitada.
+
+Comando net user <usuario> /active:no
+
+    Permite decidir si la cuenta estara inactiva osea deshabilitada.
+
+Comando net user <usuario> /fullname:"<nombre_completo>"
+
+    Permite establecer un nombre_completo a un usuario en especifico.
+
+Comando  net user <usuario> /comment:"<descripción>"
+
+    Permite establecer una descripción a un usuario es util para saber que tipo de usuario estamos creando o para no olvidar los roles del usuario.
+
+Comando net user <usuario> /passwordchg:yes
+
+    Decide si un usuario puede o no cambiar su contraseña osea si tiene permiso para hacerlo.
+
+Comando net user <usuario> /passwordchg:no
+
+    Decide si un usuario puede o no cambiar su contraseña osea si tiene permiso para hacerlo.
+
+Comando  net user <usuario> /expires:<fecha>
+
+    Sirve para establecer una fecha de expiracion a una cuenta de usuario local.
+
+Comando net user <usuario> *
+
+    sirve para cambiar la contraseña de forma interactiva y oculta.
+
+    (Nota: Debe ejecutarse en el Símbolo del sistema (cmd) o PowerShell abierto como Administrador).

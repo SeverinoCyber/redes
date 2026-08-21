@@ -1,0 +1,218 @@
+Comando: IPCONFIG
+
+        ipconfig es una herramienta de línea de comandos en sistemas operativos Windows que muestra la configuración de red IP actual de un equipo y permite gestionar la interfaz de red (como renovar la dirección IP o limpiar la caché DNS).
+
+        Al ejecutar ipconfig, el sistema devuelve información fundamental para la conectividad y el diagnóstico de red:
+
+        Dirección IPv6 local (o IPv6 de enlace local): Es la identificación única de 128 bits asignada a la tarjeta de red para comunicarse exclusivamente dentro de la red local. Comienza habitualmente con el prefijo fe80:: y no es enrutable hacia Internet.
+
+        Dirección IPv4: Es la dirección lógica de 32 bits (ej. 192.168.1.15) asignada al dispositivo dentro de la red privada local (generalmente de forma automática mediante DHCP). Permite identificar de manera única al equipo dentro de esa red.
+
+        Máscara de subred: Es una combinación de bits (ej. 255.255.255.0) que define qué parte de la dirección IP corresponde a la identificación de la red y qué parte corresponde al host (tu equipo). Permite al sistema determinar si un tráfico va dirigido a un dispositivo dentro de la misma red local o si debe enviarse hacia afuera.
+
+        Puerta de enlace predeterminada (Default Gateway): Es la dirección IP del router o dispositivo de red al que se envían todos los paquetes cuyo destino está fuera de la red local (como el tráfico hacia Internet). Actúa como el "punto de salida" de tu red.
+
+Comando PING:
+
+        El comando ping es una utilidad de diagnóstico de red que utiliza el protocolo ICMP (Internet Control Message Protocol) enviando paquetes de solicitud de eco (Echo Request) hacia una IP o nombre de dominio objetivo para verificar si este responde (Echo Reply).
+
+        Análisis Detallado de los Componentes:
+
+        Haciendo ping a 192.168.1.1: Indica la IP de destino a la cual se están enviando los paquetes ICMP (en este caso, la puerta de enlace o router local).
+
+        con 32 bytes de datos: Es el tamaño del payload de datos de prueba que lleva cada paquete enviado por defecto en Windows.
+
+        Respuesta desde 192.168.1.1: Confirma que el dispositivo de destino está encendido, conectado a la red y configurado para responder a peticiones ICMP.
+
+        bytes=32: La cantidad de datos que el dispositivo de destino devolvió de vuelta en su respuesta.
+
+        tiempo<1ms (o tiempo<1m): Es la latencia o RTT (Round-Trip Time). Indica que el paquete tardó menos de 1 milisegundo en ir y volver. Un valor tan bajo es ideal y típico de conexiones locales por cable Ethernet o redes Wi-Fi muy cercanas al router.
+
+        TTL=64 (Time to Live): Es el tiempo de vida del paquete expresado en saltos de red. Cada router por el que pasa un paquete descuenta 1 a este valor para evitar que circule infinitamente en bucles de red. Un TTL inicial de 64 sugiere habitualmente que el dispositivo de destino ejecuta un sistema operativo basado en Linux/Unix o firmware embebido (como ocurre en la mayoría de routers del hogar).
+
+Comando TRACERT:
+
+        El comando tracert (Trace Route) es una herramienta de diagnóstico que rastrea la ruta que sigue un paquete de datos desde tu equipo hasta un destino remoto (google.com).
+
+        Utiliza el campo TTL (Time to Live) de los paquetes IP para forzar a cada router intermedio a responder con un mensaje ICMP (Time Exceeded), revelando la dirección IP de cada "salto" y midiendo el tiempo de ida y vuelta en tres intentos.
+
+        Análisis detallado de tu traza:
+
+        Salto 1 (192.168.1.1): Tu router local. La latencia es menor a 1 ms, confirmando una conexión local impecable.
+
+        Salto 2 (* * * Tiempo de espera agotado): Es el primer router del proveedor de servicios de Internet (ISP). Los asteriscos no indican una avería; simplemente significa que el equipo del ISP está configurado para descartar o no responder a peticiones ICMP por motivos de seguridad o carga.
+
+        Saltos 3 al 10 (172.17.x.x): Red interna privada del ISP (enrutamiento mediante rangos RFC 1918). Muestra cómo avanza el tráfico dentro de la infraestructura central de tu proveedor antes de salir a la red global.
+
+        Saltos 11 al 17 (142.250.x.x, 192.178.x.x, 64.233.x.x): Infraestructura global y de peering de Google (red backbone 1e100.net). La latencia se mantiene estable en el rango de ~33 ms a 44 ms.
+
+        Saltos 18 al 26 (* * *): Enrutadores intermedios dentro del sistema de balanceo de carga o cortafuegos internos de Google que bloquean el tráfico de prueba ICMP.
+
+        Salto 27 (173.194.215.100): El servidor final de Google (vt-in-f100.1e100.net). Alcanzó el destino con éxito en un tiempo promedio de 43 ms.
+
+Comando NETSTAT:
+
+        El comando netstat (Network Statistics) es una herramienta de consola que muestra todas las conexiones de red activas (entrantes y salientes), las tablas de enrutamiento y las estadísticas de los protocolos en ejecución.
+
+        Permite auditar en tiempo real qué aplicaciones o procesos se están comunicando con servidores externos o dentro del mismo equipo local.
+
+        Análisis detallado de tu salida de netstat:
+
+        Proto (Protocolo): Todas las conexiones mostradas utilizan TCP (Transmission Control Protocol), lo que garantiza una entrega ordenada y confiable de los paquetes mediante un apretón de manos (handshake).
+
+        Dirección local: La IP privada de tu equipo (192.168.1.10) o las direcciones de bucle interno (127.0.0.1 en IPv4 y [::1] en IPv6), seguidas del puerto efímero asignado dinámicamente por Windows para esa sesión.
+
+        Dirección remota: El destino con el cual se comunica tu equipo. La mayoría indica el puerto :https (puerto 443 encriptado).
+
+        Estado: Indica la fase del ciclo de vida de la conexión TCP:
+
+        ESTABLISHED: Conexión activa y transmitiendo datos activamente.
+
+        CLOSE_WAIT: El servidor remoto solicitó cerrar la sesión y la aplicación local está procesando el cierre final de su lado.
+
+        Clasificación de tus Conexiones Activas
+        1. Comunicaciones Internas del Sistema (Loopback)
+
+        Direcciones: 127.0.0.1 y [::1] hacia el equipo local (Algelis).
+
+        Explicación: Son procesos de software corriendo en tu PC que hablan entre sí internamente (por ejemplo, comunicación entre el backend y frontend de una aplicación, VS Code con un entorno de ejecución, un antivirus o servicios de Windows). No consumen ancho de banda de Internet.
+
+        2. Servicios Web Seguros e Infraestructura de Red (HTTPS / CDN)
+
+        Cloudflare / CDN (104.18.x.x, 172.64.x.x, 151.101.x.x): Conexiones de navegación web a sitios optimizados por proveedores de contenido.
+
+        Akamai (a23-50-x.x, a23-39-x.x): Servidores de entrega de contenido (actualizaciones de programas, elementos de páginas web).
+
+        Servicios de Microsoft / Azure (52.110.x.x, 52.96.x.x, 20.85.x.x): Sincronización en segundo plano de Windows Update, Teams, OneDrive o Microsoft Store.
+
+        Amazon Web Services (ec2-3-x.x, ec2-54-x.x): Aplicaciones web o servicios en la nube alojados en AWS.
+
+        3. Plataformas Específicas
+
+        Servidor de Juegos / Plataforma (cmp1-dfw2:27018): Conexión abierta en un puerto alternativo (27018 es utilizado por la plataforma Steam / servidores de juegos en el nodo Dallas-Fort Worth dfw).
+
+Comando NSLOOKUP:
+
+        El comando nslookup (Name Server Lookup) es una herramienta de diagnóstico de red utilizada para consultar los servidores DNS (Domain Name System) y obtener la traducción entre nombres de dominio (google.com) y sus correspondientes direcciones IP (IPv4 e IPv6), o viceversa.
+
+        Análisis Detallado de tu Salida
+        1. El Servidor Consultador (DNS Resolver)
+
+        Servidor: adsl-0-73.tricom.net / Address: 148.103.0.73: Muestra el servidor DNS configurado en tu equipo que procesó la consulta. En este caso, estás utilizando el servidor DNS de tu proveedor de Internet local (Tricom / Altice).
+
+        2. El Tipo de Respuesta
+
+        Respuesta no autoritativa: Significa que el servidor DNS de tu proveedor no es el dueño original de los registros de Google. Tu DNS consultó a los servidores autoritativos de Google, guardó los datos temporalmente en su memoria caché (cache DNS) y te devolvió una copia rápida.
+
+        3. Los Resultados de la Búsqueda
+
+        Nombre: google.com: El dominio objetivo que solicitaste traducir.
+
+        Addresses: Las direcciones IP reales asociadas a ese dominio en ese instante:
+
+        2607:f8b0:4008:808::200e: Dirección IPv6 asignada a Google.
+
+        173.194.215.100 a 139: Lista de 6 direcciones IPv4 distintas.
+
+Comando ARP:
+
+        El comando arp (Address Resolution Protocol) muestra y gestiona la tabla de traducción entre direcciones de capa de red (IPv4) y direcciones de capa de enlace de datos (MAC / Dirección física). Esta tabla le permite a tu tarjeta de red saber exactamente a qué chip de red físico debe entregarle las tramas dentro de la misma red local.
+
+        Análisis Detallado de tu Tabla ARP
+        1. Identificación de la Interfaz (192.168.1.10 --- 0x4)
+
+        Indica la IP de tu propia tarjeta de red (192.168.1.10) y el índice interno de la interfaz en Windows (0x4).
+
+        2. Dispositivos Físicos Reales en la Red
+
+        192.168.1.1 | 7c-b7-33-bc-a3-bc | Dinámico: Es tu router/puerta de enlace. Es de tipo dinámico porque tu PC descubrió esa dirección MAC automáticamente mediante una petición ARP ("¿Quién tiene la IP 192.168.1.1?"). Se borrará o actualizará de la memoria caché si deja de usarse.
+
+        3. Direcciones de Difusión (Broadcast) y Multicast (Estáticas)
+
+        ff-ff-ff-ff-ff-ff (192.168.1.255 y 255.255.255.255): Son direcciones de difusión. Todo paquete enviado aquí es recibido por todos los dispositivos conectados a tu red local.
+
+        01-00-5e-xx-xx-xx (Rango 224.0.0.0 a 239.255.255.250): Son direcciones Multicast reservadas para protocolos especiales:
+
+        224.0.0.2: Enrutadores de la subred local.
+
+        224.0.0.22: Gestión de grupos IGMPv3 (tráfico de streaming o VoIP).
+
+        224.0.0.251: Protocolo mDNS (usado por Apple Bonjour, Chromecast e impresoras para autoreconocerse sin servidor DNS).
+
+        224.0.0.252: Protocolo LLMNR (resolución de nombres local en Windows).
+
+        239.255.255.250: Protocolo SSDP / UPnP (para detectar Smart TVs, consolas y dispositivos IoT).
+
+Comando ROUTE:
+
+        El comando route (o route print) muestra la tabla de enrutamiento IP del sistema operativo. Esta tabla es el "mapa de navegación" que utiliza tu tarjeta de red para decidir a través de qué interfaz y hacia qué dirección de salto debe enviar cada paquete de datos según su IP de destino.
+
+        Análisis Detallado de tu Tabla de Enrutamiento
+        1. Lista de Interfaces
+
+        Interfaz 4 (Intel(R) Ethernet Connection I219-V): Tu tarjeta de red física Ethernet (conexión por cable), identificada con la MAC b0:6e:bf:2c:44:44.
+
+        Interfaz 1 (Software Loopback Interface 1): Interfaz virtual interna para el tráfico de bucle local (127.0.0.1).
+
+        2. Rutas IPv4 Clave
+
+        0.0.0.0 (Ruta por defecto): Es la regla más importante. Indica que cualquier paquete cuyo destino no sea tu red local debe enviarse a la puerta de enlace 192.168.1.1 (tu router) usando la interfaz 192.168.1.10.
+
+        127.0.0.0 / 127.0.0.1 / 127.255.255.255: Red de bucle interno. Todo lo dirigido a estas direcciones se procesa dentro del propio sistema sin salir a la red.
+
+        192.168.1.0 (Máscara 255.255.255.0): Define el rango de tu red local (192.168.1.1 a 192.168.1.254). Dice "todo lo que esté en esta red se entrega directamente ("En vínculo") a través de la interfaz 192.168.1.10 sin pasar por el router".
+
+        192.168.1.10: La ruta hacia tu propia IP dentro de la máquina.
+
+        192.168.1.255 y 255.255.255.255: Rutas de difusión (broadcast) para enviar paquetes a todos los dispositivos de la subred local o la red entera.
+
+        224.0.0.0 (Máscara 240.0.0.0): Rango de direcciones Multicast reservadas para transmisiones a grupos de dispositivos.
+
+        3. Métrica
+
+        Es el "costo" o prioridad de una ruta. A menor número de métrica, mayor es la preferencia de Windows para usar esa ruta. La ruta por defecto hacia el router tiene una métrica de 25, lo que le da prioridad para el tráfico de Internet.
+
+        4. Tabla IPv6
+
+        Contiene el equivalente en IPv6: ::1/128 (bucle local), fe80::/64 (direcciones de enlace local) y ff00::/8 (multicast IPv6).
+
+Comando PATHPING:
+
+        El comando pathping es una herramienta avanzada de diagnóstico de red exclusiva de Windows que combina las funciones de tracert y ping.
+
+        Primero realiza un rastreo para identificar todos los enrutadores (saltos) en la ruta hacia un destino remoto (google.com), y luego se queda escuchando y enviando múltiples paquetes durante un período de tiempo (25 segundos por cada salto) para medir la latencia promedio y, de manera crucial, calcular el porcentaje de pérdida de paquetes en cada tramo del camino.
+
+        Análisis Detallado de tu Salida1.
+
+        Primera Fase: Traza Inicial (Comportamiento tipo tracert)
+        0 Algelis [192.168.1.10]: Es tu equipo local, el punto de origen.
+        
+        1 192.168.1.1: El primer salto, tu router o puerta de enlace local.
+        2 * * *: El router de tu proveedor de Internet (ISP) bloqueó los paquetes de prueba ICMP iniciales. Debido a esto, pathping detuvo la traza en ese punto para pasar a la fase de análisis de métricas.
+        
+        2. Segunda Fase: Análisis de Rendimiento y Pérdidas (25 segundos de prueba)
+        Salto 0 (Algelis): Muestra que tu equipo no tiene ningún tipo de congestión interna ni pérdida de paquetes (0/100 = 0%).
+        Vínculo (0 -> 1): El enlace entre tu PC y tu router tiene un $0\%$ de pérdidas (0/100 = 0%).
+        Salto 1 (192.168.1.1): Tu router responde con una latencia de 0ms y un 0% de pérdida de paquetes en los 100 envíos de prueba.
+
+Comando HOSTNAME:
+
+        El comando hostname es una utilidad simple de línea de comandos (disponible en Windows, Linux y macOS) que muestra o cambia el nombre de red asignado al equipo (Host Name).
+
+        Su función principal es identificar de manera única a la computadora dentro de una red local o dominio, permitiendo que otros dispositivos puedan referirse a ella por un nombre legible (ej. Algelis-PC) en lugar de memorizar su dirección IP.
+
+        Análisis Detallado
+        Origen del nombre: El nombre devuelto es el nombre del equipo configurado durante la instalación del sistema operativo o cambiado posteriormente en la configuración del sistema.
+
+        Uso en resolución de nombres: Cuando intentas conectar con un equipo en tu red local (por ejemplo, a través de NetBIOS, mDNS o DNS local), el sistema traduce ese hostname a la IP actual del dispositivo.
+
+        Uso en comandos: Es la forma más rápida de confirmar en qué equipo estás trabajando antes de ejecutar scripts,
+
+Comando GETMAC:
+
+        El comando getmac es una utilidad de línea de comandos en Windows que muestra las direcciones MAC (Media Access Control) o direcciones físicas de todos los adaptadores de red (físicos y virtuales) instalados en el equipo, junto con su identificador de protocolo asociado.
+
+        Análisis Detallado de tu Salida
+        Dirección física (B0-6E-BF-2C-44-44): Es la dirección MAC única de 48 bits (6 pares hexadecimales) grabada en el chip de tu tarjeta de red por el fabricante (Intel). Sirve para identificar de manera unívoca a tu dispositivo en la Capa 2 (Enlace de datos) del modelo OSI dentro de la red local.
+
+        Nombre de transporte (\Device\Tcpip_{...}): Es el identificador interno (GUID) que asigna Windows para vincular la pila del protocolo TCP/IP con esa interfaz física en el sistema operativo.
